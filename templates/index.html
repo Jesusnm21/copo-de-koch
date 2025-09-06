@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Fractal Koch Animado</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      background-size: 300% 300%;
+      animation: bgMove 12s ease infinite;
+      color: white;
+      text-align: center;
+      overflow-x: hidden;
+    }
+
+    
+
+    h1 {
+      margin-top: 30px;
+      font-weight: 600;
+      font-size: 2.4rem;
+      letter-spacing: 1px;
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+      opacity: 0;
+      transform: translateY(-20px);
+      animation: fadeInSlide 1s ease forwards;
+    }
+
+    @keyframes fadeInSlide {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .controls {
+      margin-top: 20px;
+      padding: 15px 25px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      display: inline-block;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInSlide 1s ease 0.5s forwards;
+    }
+
+    label {
+      margin: 0 10px;
+      font-weight: 500;
+    }
+
+    input {
+      padding: 6px 10px;
+      margin: 5px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      border-color: cyan;
+      box-shadow: 0 0 8px cyan;
+    }
+
+    button {
+      padding: 10px 18px;
+      margin-left: 10px;
+      background: linear-gradient(90deg, cyan, #00aaff);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #142531;
+      transition: all 0.3s ease;
+      animation: pulse 2s infinite;
+    }
+
+    button:hover {
+      transform: scale(1.07);
+      box-shadow: 0 0 20px cyan;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0px rgba(0, 255, 255, 0.6); }
+      50% { box-shadow: 0 0 15px rgba(0, 255, 255, 0.8); }
+      100% { box-shadow: 0 0 0px rgba(0, 255, 255, 0.6); }
+    }
+
+    canvas {
+      display: block;
+      margin: 30px auto;
+      border-radius: 12px;
+      
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeInSlide 1s ease 1s forwards;
+    }
+  </style>
+</head>
+<body>
+  <h1>Fractal de Koch (Animado)</h1>
+
+  <div class="controls">
+    <label>Iteraciones:</label>
+    <input type="number" id="order" value="4" min="0" max="8">
+    <label>Longitud:</label>
+    <input type="number" id="length" value="400" min="50" max="800">
+    <button onclick="drawFractal()">Dibujar</button>
+  </div>
+
+  <canvas id="canvas" width="800" height="600"></canvas>
+
+  <script>
+    async function drawFractal() {
+      const order = document.getElementById("order").value;
+      const length = document.getElementById("length").value;
+      const res = await fetch(`/fractal/${order}/${length}`);
+      const data = await res.json();
+      const pts = data.points;
+
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Estilo del fractal con glow dinámico
+      ctx.strokeStyle = "cyan";
+      ctx.shadowColor = "cyan";
+      ctx.shadowBlur = 15;
+      ctx.lineWidth = 2;
+
+      let i = 0;
+      function animate() {
+        if (i < pts.length - 1) {
+          const [x1, y1] = pts[i];
+          const [x2, y2] = pts[i+1];
+          ctx.beginPath();
+          ctx.moveTo(x1 + 400, 600 - (y1 + 300));
+          ctx.lineTo(x2 + 400, 600 - (y2 + 300));
+          ctx.stroke();
+          i++;
+          requestAnimationFrame(animate);
+        }
+      }
+      animate();
+    }
+
+    window.onload = drawFractal;
+  </script>
+</body>
+</html>
