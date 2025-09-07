@@ -1,3 +1,3 @@
-git+https://github.com/Jesusnm21/copo-de-koch.git@main#egg=aext-assistant
+
 flask
 requests
